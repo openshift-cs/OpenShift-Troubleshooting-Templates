@@ -22,7 +22,7 @@ def index():
         return redirect(url_for('google.login'))
     resp = google.get('/oauth2/v2/userinfo')
     assert resp.ok, resp.text
-    return f'<h2>Your Google OAuth ID is: {resp.json()["id"]}</h2>'
+    return '<h2>Your Google OAuth ID is: {}</h2>'.format(resp.json()["id"])
 
 
 if __name__ == "__main__":
