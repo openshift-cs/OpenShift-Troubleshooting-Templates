@@ -11,7 +11,7 @@ app.secret_key = os.urandom(64)
 blueprint = make_google_blueprint(
     client_id=os.environ.get('GOOGLE_CLIENT_ID', ''),
     client_secret=os.environ.get('GOOGLE_CLIENT_SECRET', ''),
-    scope=['profile']
+    scope=['https://www.googleapis.com/auth/userinfo.profile']
 )
 app.register_blueprint(blueprint, url_prefix='/login')
 
