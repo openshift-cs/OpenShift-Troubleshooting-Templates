@@ -14,16 +14,14 @@ for your convenience. This application does not store any data or information.
 ### Deploying from a local git repo
 
     oc new-app . --image-stream=python:latest --name=google-oauth-userid
-    oc env dc/google-oauth-userid GOOGLE_CLIENT_ID=<google_client_id>
-    oc env dc/google-oauth-userid GOOGLE_CLIENT_SECRET=<google_client_secret>
+    oc set env dc/google-oauth-userid GOOGLE_CLIENT_ID=<google_client_id> GOOGLE_CLIENT_SECRET=<google_client_secret>
     oc start-build google-oauth-userid --from-repo=.
     oc create route edge --service=google-oauth-userid --insecure-policy=Redirect
 
 ### Deploy from an existing git repo
 
     oc new-app https://github.com/openshift-cs/OpenShift-Troubleshooting-Templates --image-stream=python:latest --context-dir=google-oauth-userid --name=google-oauth-userid
-    oc env dc/google-oauth-userid GOOGLE_CLIENT_ID=<google_client_id>
-    oc env dc/google-oauth-userid GOOGLE_CLIENT_SECRET=<google_client_secret>
+    oc set env dc/google-oauth-userid GOOGLE_CLIENT_ID=<google_client_id> GOOGLE_CLIENT_SECRET=<google_client_secret>
     oc start-build google-oauth-userid
     oc create route edge --service=google-oauth-userid --insecure-policy=Redirect
 
