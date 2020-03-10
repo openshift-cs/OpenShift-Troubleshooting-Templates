@@ -1,7 +1,7 @@
-from gevent.wsgi import WSGIServer
+from gevent.pywsgi import WSGIServer
 from flask import Flask, redirect, url_for
 from flask_dance.contrib.google import make_google_blueprint, google
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 
 
