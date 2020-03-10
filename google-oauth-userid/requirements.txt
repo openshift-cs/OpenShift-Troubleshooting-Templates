@@ -1,3 +1,4 @@
-Flask~=1.0.2
-Flask-Dance~=0.14.0
-gevent~=1.2.2
+Flask=1.1.*
+Flask-Dance=3.0.*
+gevent=1.4.*
+Werkzeug=1.0.*
