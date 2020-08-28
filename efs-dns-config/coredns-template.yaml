@@ -1,0 +1,168 @@
+---
+kind: "Template"
+apiVersion: "v1"
+metadata:
+  name: "custom-coredns"
+  annotations:
+    openshift.io/display-name: "Custom CoreDNS"
+    description: "Deploys a custom CoreDNS server for managing static resolution"
+    tags: "go,coredns"
+    iconClass: "icon-shadowman"
+    template.openshift.io/long-description: "This template defines resources needed to deploys a custom CoreDNS server for managing static resolution."
+    template.openshift.io/provider-display-name: "Red Hat, Inc."
+message: "The following service(s) have been created in your project: ${NAME}."
+labels:
+  template: "coredns-deployment"
+objects:
+  - kind: "ConfigMap"
+    apiVersion: "v1"
+    metadata:
+      name: "${NAME}-config"
+      labels:
+        app: "${NAME}"
+    data:
+      Corefile: |
+        ${DOMAIN}:8053 {
+            errors
+            health
+            file /etc/coredns/${DOMAIN}
+            cache 30
+            reload
+        }
+      ${DOMAIN}: |
+        $TTL    1800
+        $ORIGIN ${DOMAIN}.
+
+        @ IN SOA dns domains (
+            2020031101   ; serial
+            300          ; refresh
+            1800         ; retry
+            14400        ; expire
+            300 )        ; minimum
+
+        ${RESOURCE}        IN  A  ${IP_ADDRESS}
+
+
+  - kind: "Service"
+    apiVersion: "v1"
+    metadata:
+      name: "${NAME}"
+      labels:
+        app: "${NAME}"
+    spec:
+      ports:
+      - name: "53-tcp"
+        port: 53
+        protocol: "TCP"
+        targetPort: 8053
+      - name: "53-udp"
+        port: 53
+        protocol: "UDP"
+        targetPort: 8053
+      selector:
+        app: "${NAME}"
+        deploymentconfig: "${NAME}"
+
+
+  - kind: "DeploymentConfig"
+    apiVersion: "v1"
+    metadata:
+      name: "${NAME}"
+      labels:
+        app: "${NAME}"
+    spec:
+      strategy:
+        type: "Rolling"
+      triggers:
+        - type: "ConfigChange"
+      replicas: 1
+      test: false
+      selector:
+        name: "${NAME}"
+      template:
+        metadata:
+          name: "${NAME}"
+          labels:
+            name: "${NAME}"
+            app: "${NAME}"
+        spec:
+          containers:
+            - name: "${NAME}"
+              image: "quay.io/openshift/origin-coredns:4.5"
+              command:
+                - "/usr/bin/coredns"
+              args:
+                - "-dns.port"
+                - "8053"
+                - "-conf"
+                - "/etc/coredns/Corefile"
+              volumeMounts:
+                - name: "${NAME}-config"
+                  mountPath: "/etc/coredns"
+              name: "${NAME}-config"
+              ports:
+                - containerPort: 8053
+              readinessProbe:
+                timeoutSeconds: 10
+                initialDelaySeconds: 10
+                httpGet:
+                  path: "/health"
+                  port: 8080
+                  scheme: "HTTP"
+              livenessProbe:
+                timeoutSeconds: 10
+                initialDelaySeconds: 10
+                httpGet:
+                  path: "/health"
+                  port: 8080
+                  scheme: "HTTP"
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "70Mi"
+                limits:
+                  memory: "256Mi"
+          volumes:
+            - name: "${NAME}-config"
+              configMap:
+                defaultMode: 420
+                name: "${NAME}-config"
+
+
+  - kind: "HorizontalPodAutoscaler"
+    apiVersion: "autoscaling/v1"
+    metadata:
+      name: "${NAME}"
+      labels:
+        app: "${NAME}"
+    spec:
+      scaleTargetRef:
+        kind: DeploymentConfig
+        name: "${NAME}"
+        apiVersion: "v1"
+      minReplicas: 1
+      maxReplicas: 4
+      targetCPUUtilizationPercentage: 75
+
+
+parameters:
+  - name: "NAME"
+    displayName: "Application name"
+    description: "The name assigned to all of the application components defined in this template."
+    required: true
+    value: "coredns"
+
+  - name: "DOMAIN"
+    displayName: "Domain name"
+    description: "The domain of the static resource, e.g., 'sub.example.com' for a link.sub.example.com resource."
+    required: true
+
+  - name: "RESOURCE"
+    displayName: "Resource name"
+    description: "The actual resource value, e.g., 'link' for a link.sub.example.com resource."
+    required: true
+    value: "index.html"
+
+  - name: "IP_ADDRESS"
+    displayName: "IP Address"
+    description: "The static IP address that the resource should resolve to."
