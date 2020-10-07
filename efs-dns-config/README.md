@@ -31,9 +31,9 @@ to run `oc rollout restart dc/coredns` to pull in any changes.
 
 ```bash
 $ oc new-app https://raw.githubusercontent.com/openshift-cs/OpenShift-Troubleshooting-Templates/master/efs-dns-config/coredns-template.yaml \
-    -p DOMAIN=sub.example.com \
-    -p RESOURCE=link \
-    -p IP_ADDRESS=127.0.0.1
+    -p DOMAIN=efs.us-west-2.amazonaws.com \
+    -p RESOURCE=fs-df3e4fda \
+    -p IP_ADDRESS=10.0.159.96
 ```
 
 ## Configure OpenShift DNS Forwarding
@@ -43,8 +43,11 @@ The source of this information comes from the OpenShift documentation: https://d
 1. Get the `ClusterIP` of your new service
 
         $ export SERVICE_IP=$(oc get service coredns -o custom-columns=CLUSTER-IP:.spec.clusterIP --no-headers)
-        $ export FORWARD_DOMAIN=sub.example.com
+        $ export FORWARD_DOMAIN=efs.us-west-2.amazonaws.com
 
 2. Configure the DNS operator
+
+        # If you don't have any DNS forwarding currently in use, you must run this first
+        $ oc patch dns.operator default --type=json --patch='[{"op": "add", "path": "/spec", "value": {"servers": []}}]'
 
         $ oc patch dns.operator default --type=json --patch="[{\"op\": \"add\", \"path\": \"/spec/servers/-1\", \"value\": {\"name\": \"upstream-dns\", \"zones\": [\"$FORWARD_DOMAIN\"], \"forwardPlugin\": {\"upstreams\": [\"$SERVICE_IP\"]}}}]"
