@@ -164,14 +164,14 @@ function wait_for_deployment {
 }
 
 function wait_for_pvc_attachment {
-    POD=$(oc describe pvc $1 | grep "Mounted By" | grep -v '<none>$')
+    POD=$(oc describe pvc $1 | grep -E "(Mounted|Used) By" | grep -v '<none>$')
 
     echo "Waiting for PVC to attach..."
 
     while [ -z "$POD" ] ; do
         echo "...Not attached yet"
         sleep 3
-        POD=$(oc describe pvc $1 | grep "Mounted By" | grep -v '<none>$')
+        POD=$(oc describe pvc $1 | grep -E "(Mounted|Used) By" | grep -v '<none>$')
     done
 
     echo "...Attached"
@@ -208,7 +208,7 @@ function  find_pod_with_pvc {
     echo "Finding pod with PVC '$1' attached..."
 
     # Find pod with PVC attached
-    POD=$(oc describe pvc $1 2> /dev/null | grep "Mounted By" | grep -v '<none>$')
+    POD=$(oc describe pvc $1 2> /dev/null | grep -E "(Mounted|Used) By" | grep -v '<none>$')
 }
 
 function set_pod_params {
