@@ -5,6 +5,10 @@ This script attempts to provide a generic method of migrating PV data between tw
 different OpenShift clusters. There is nothing technical that would prevent this
 script from migrating PV data between two namespaces within the same cluster.
 
+## Prerequisites
+
+- `oc` version 4.x (not supported on `oc` version 3.x)
+
 ## Usage
 
 ```
