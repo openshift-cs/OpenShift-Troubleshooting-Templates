@@ -1,11 +1,11 @@
 variable "aws_region" {
   type        = string
   description = "The region to create the ROSA cluster in"
-  default     = "us-east-1"
+  default     = "us-east-2"
   
   validation {
-    condition     = contains(["us-east-1", "eu-west-1"], var.aws_region)
-    error_message = "HyperShift is currently only availble in these regions: us-east-1, eu-west-1."
+    condition     = contains(["us-east-1", "us-east-2", "eu-west-1"], var.aws_region)
+    error_message = "HyperShift is currently only availble in these regions: us-east-1, us-east-2, eu-west-1."
   }
 }
 
@@ -16,7 +16,8 @@ variable "az_ids" {
   })
   description = "A list of region-mapped AZ IDs that a subnet should get deployed into"
   default     = {
-    us-east-1 = ["use1-az1", "use1-az2"]
+    us-east-1 = ["use1-az3", "use1-az6"]
+    us-east-2 = ["use2-az2", "use2-az3"]
     eu-west-1 = ["euw1-az1", "euw1-az2"]
   }
 }
