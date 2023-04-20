@@ -12,6 +12,7 @@ variable "aws_region" {
 variable "az_ids" {
   type        = object({
     us-east-1 = list(string)
+    us-east-2 = list(string)
     eu-west-1 = list(string)
   })
   description = "A list of region-mapped AZ IDs that a subnet should get deployed into"
