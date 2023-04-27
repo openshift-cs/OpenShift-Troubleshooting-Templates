@@ -17,8 +17,8 @@ variable "az_ids" {
   })
   description = "A list of region-mapped AZ IDs that a subnet should get deployed into"
   default     = {
-    us-east-1 = ["use1-az3", "use1-az6"]
-    us-east-2 = ["use2-az2", "use2-az3"]
+    us-east-1 = ["use1-az1", "use1-az2"]
+    us-east-2 = ["use2-az1", "use2-az2"]
     eu-west-1 = ["euw1-az1", "euw1-az2"]
   }
 }
