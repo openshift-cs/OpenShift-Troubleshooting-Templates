@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
 variable "aws_region" {
   type        = string
   description = "The region to create the ROSA cluster in"
