@@ -19,6 +19,7 @@ variable "aws_region" {
 
 variable "az_ids" {
   type = object({
+    eu-central-1 = list(string)
     eu-west-1 = list(string)
     us-east-1 = list(string)
     us-east-2 = list(string)
